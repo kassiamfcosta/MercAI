@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Lista de Compras</title>
+
+    <style>
+        /* ===== VARIÁVEIS E CONFIGURAÇÕES GLOBAIS ===== */
+        :root {
+            --cor-fundo-app: #F4F9FA;
+            --cor-fundo-topo: #01182A;
+            --cor-texto-claro: #F4F9FA;
+            --cor-destaque-ciano: #2ED5D8;
+            --cor-destaque-amarelo: #F2B705;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #0B2C3A;
+            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transicao-padrao: all 0.3s ease;
+        }
+
+        /* ===== RESET E ESTILOS BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-app);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+        }
+
+        /* ===== TOP SECTION (HEADER) ===== */
+        .top-section {
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .control-icon {
+            background-color: var(--cor-icone-fundo-final);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .control-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background-color: #0B2C3A;
+            color: var(--cor-texto-claro);
+            font-size: 1em;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background-color: #0B2C3A;
+            box-shadow: 0 0 0 2px var(--cor-destaque-ciano);
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar img {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ===== LISTA DE PRODUTOS ===== */
+        .list-container {
+            background-color: var(--cor-fundo-app);
+            padding: 20px 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 5;
+            min-height: calc(100vh - 130px);
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 15px;
+            border-bottom: 1px solid #E0E0E0;
+            margin-bottom: 10px;
+        }
+
+        .list-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--cor-fundo-topo);
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .list-action-btn {
+            background: none;
+            border: none;
+            color: var(--cor-destaque-ciano);
+            font-size: 0.9em;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: var(--transicao-padrao);
+        }
+
+        .list-action-btn:hover {
+            background-color: rgba(0, 188, 212, 0.1);
+        }
+
+        .empty-list {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-list img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-list h3 {
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #E0E0E0;
+            background-color: white;
+            margin: 0 10px 10px;
+            border-radius: 10px;
+            box-shadow: var(--sombra-suave);
+            transition: var(--transicao-padrao);
+        }
+
+        .list-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f5f5f5;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-details h4 {
+            font-size: 1.1em;
+            margin: 0 0 5px;
+            color: #333;
+        }
+
+        .item-details p {
+            font-size: 0.85em;
+            color: #777;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+
+        .item-quantity {
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-btn {
+            background-color: var(--cor-fundo-app);
+            border: 1px solid #ddd;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: var(--transicao-padrao);
+        }
+
+        .quantity-btn:hover {
+            background-color: var(--cor-destaque-ciano);
+            color: white;
+            border-color: var(--cor-destaque-ciano);
+        }
+
+        .quantity-value {
+            margin: 0 10px;
+            font-weight: bold;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .delete-icon {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transicao-padrao);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-icon:hover {
+            background-color: rgba(255, 107, 107, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* ===== BOTÃO DE AÇÃO (PROCURAR MAIS) ===== */
+        .action-button {
+            width: 90%;
+            display: block;
+            margin: 30px auto 20px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--cor-destaque-amarelo);
+            color: #333;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: var(--transicao-padrao);
+        }
+
+        .action-button:hover {
+            background-color: #e6a700;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        /* ===== NAVBAR INFERIOR ===== */
+        /* Container da navbar */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 70px;
+            background: transparent;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* SVG de fundo da barra */
+        .navbar svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            display: block;
+            z-index: -1;
+        }
+
+        /* Ícones */
+        .nav-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Botão central (flutuante com brilho) */
+        .nav-center-item {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .nav-center-button {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at center, #2ed5d8 0%, #01182a 80%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px #2ed5d8, 0 0 30px rgba(46, 213, 216, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-center-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 20px #2ed5d8, 0 0 40px rgba(46, 213, 216, 0.6);
+        }
+
+        /* Ícone dentro do botão */
+        .nav-center-button img {
+            width: 150px;
+            height: 150px;
+        }
+
+        /* Itens laterais reposicionados corretamente */
+        .nav-item:nth-of-type(2) {
+            margin-right: 150px; /* espaço antes do botão central */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-area">
+        <header class="top-section">
+            <div class="header-title">Minha Lista de Compras</div>
+            <div class="search-controls">
+                <div class="control-icon" title="Voltar">
+                    <img src="img/menu_hamburguer.png" alt="Opções">
+                </div>
+
+                <div class="search-bar">
+                    <img src="img/search_white.png" alt="Buscar">
+                    <input type="text" id="search-list-input" placeholder="Buscar na lista...">
+                </div>
+
+                <div class="control-icon" title="Opções da Lista" id="list-options-btn">
+                    <img src="img/user_white.png" alt="Opções">
+                </div>
+            </div>
+        </header>
+
+        <main class="list-container">
+            <div class="list-header">
+                <h2 class="list-title">Itens da Lista</h2>
+                <div class="list-actions">
+                    <button class="list-action-btn" id="clear-list-btn">Limpar Lista</button>
+                </div>
+            </div>
+
+            <div id="list-items-container">
+            </div>
+
+            <button class="action-button" onclick="window.location.href='pesquisar_produto.html'">
+                Adicionar mais produtos
+            </button>
+        </main>
+    </div>
+
+    <nav class="navbar">
+        <svg width="390" height="50" viewBox="0 0 390 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M390 50H0V0H127.199C127.891 0.0148855 130.416 0.0253944 135.28 0.0253906C165.625 0.0256737 161.834 37.2663 194.59 37.2666C227.346 37.2666 223.556 0.0255408 253.9 0.0253906C258.765 0.0253878 261.29 0.0148846 261.981 0H390V50Z" fill="#0B2C3A"/>
+        </svg>
+
+
+        <a href="inicio.html" class="nav-item active">
+            <img src="img/home_barra_de_tarefa.png" alt="Início">
+        </a>
+
+        <a href="pesquisar_produto.html" class="nav-item">
+            <img src="img/lupa_barra_de_tarefa.png" alt="Busca">
+        </a>
+
+        <div class="nav-item nav-center-item calculate-button" id="start-calculation-btn">
+            <button class="nav-center-button" id="ai-button">
+                <img src="img/botao_calculo_barra_tarefa.png" alt="MercAI">
+            </button>
+        </div>
+
+        <a href="lista_de_compras.html" class="nav-item">
+            <img src="img/lista_barra_tarefa.png" alt="Listas">
+        </a>
+
+        <a href="perfil.html" class="nav-item">
+            <img src="img/user.png" alt="Perfil">
+        </a>
+    </nav>
+
+    <script>
+        // Dados de exemplo, você pode usar localStorage ou os produtos selecionados (selectedProducts) aqui
+        let listaDeCompras = [
+            { id: 1, nome: "Banana Prata", descricao: "Fruta fresca e nutritiva", imagem: "img/pitaia.jpeg", quantidade: 3, categoria: "comida" },
+            { id: 2, nome: "Detergente Neutro", descricao: "Limpeza eficiente para louças", imagem: "img/pitaia.jpeg", quantidade: 1, categoria: "limpeza" },
+            { id: 3, nome: "Arroz Integral", descricao: "Grão integral nutritivo", imagem: "img/pitaia.jpeg", quantidade: 2, categoria: "comida" },
+            { id: 4, nome: "Sabão em Pó", descricao: "Para roupas brancas e coloridas", imagem: "img/pitaia.jpeg", quantidade: 1, categoria: "limpeza" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const listItemsContainer = document.getElementById('list-items-container');
+            const searchInput = document.getElementById('search-list-input');
+            const clearListBtn = document.getElementById('clear-list-btn');
+            const shareListBtn = document.getElementById('share-list-btn');
+            const listOptionsBtn = document.getElementById('list-options-btn');
+
+            // Novos botões
+            const aiSuggestionsBtn = document.getElementById('ai-suggestions-btn'); // Botão Central Navbar
+            const startCalculationBtn = document.getElementById('start-calculation-btn'); // Novo Botão Grande
+
+            // Carrega os itens da lista
+            carregarLista();
+
+            // LÓGICA DE NAVEGAÇÃO DA IA
+            const navigateToLoading = () => {
+                if (listaDeCompras.length === 0) {
+                    alert("Sua lista está vazia! Adicione produtos antes de comparar preços.");
+                    return;
+                }
+                // Redireciona para a tela de loading de cálculo
+                window.location.href = 'calculo_loading.html';
+            };
+
+            // CONEXÃO DOS BOTÕES COM O FLUXO DE CÁLCULO
+            startCalculationBtn.addEventListener('click', navigateToLoading);
+            aiSuggestionsBtn.addEventListener('click', navigateToLoading);
+
+            // Adiciona funcionalidade de pesquisa na lista
+            searchInput.addEventListener('input', (e) => {
+                const termo = e.target.value.toLowerCase().trim();
+                filtrarLista(termo);
+            });
+
+            // Adiciona funcionalidade ao botão de limpar lista
+            clearListBtn.addEventListener('click', () => {
+                if (confirm('Tem certeza que deseja limpar toda a lista?')) { limparLista(); }
+            });
+
+            // Adiciona funcionalidade ao botão de compartilhar
+            shareListBtn.addEventListener('click', () => { compartilharLista(); });
+
+            // Adiciona funcionalidade ao botão de opções
+            listOptionsBtn.addEventListener('click', () => { abrirOpcoesLista(); });
+
+            /* --- FUNÇÕES DE MANIPULAÇÃO DA LISTA (Mantidas) --- */
+
+            function carregarLista() {
+                if (listaDeCompras.length === 0) {
+                    exibirListaVazia();
+                    // Garante que os botões de ação permaneçam visíveis
+                    document.getElementById('start-calculation-btn').style.display = 'none';
+                    return;
+                }
+                document.getElementById('start-calculation-btn').style.display = 'block';
+                listItemsContainer.innerHTML = '';
+                listaDeCompras.forEach(item => {
+                    const listItem = criarElementoLista(item);
+                    listItemsContainer.appendChild(listItem);
+                });
+            }
+
+            function criarElementoLista(item) {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.setAttribute('data-id', item.id);
+                listItem.setAttribute('data-categoria', item.categoria);
+
+                listItem.innerHTML = `
+                    <div class="product-image">
+                        <img src="${item.imagem}" alt="${item.nome}">
+                    </div>
+                    <div class="item-details">
+                        <h4>${item.nome}</h4>
+                        <p>${item.descricao}</p>
+                    </div>
+                    <span class="delete-icon" data-id="${item.id}"><img src="img/delete.png"></span>
+                `;
+
+                const deleteBtn = listItem.querySelector('.delete-icon');
+
+                deleteBtn.addEventListener('click', () => removerItem(item.id));
+
+                return listItem;
+            }
+
+            function exibirListaVazia() {
+                listItemsContainer.innerHTML = `
+                    <div class="empty-list">
+                        <img src="img/lista_barra_de_tarefa.png" alt="Lista vazia">
+                        <h3>Sua lista está vazia</h3>
+                        <p>Adicione produtos à sua lista para vê-los aqui.</p>
+                        <p>Use o botão "Adicionar mais produtos" ou o botão IA para começar!</p>
+                    </div>
+                `;
+            }
+
+            function filtrarLista(termo) { /* ... Lógica de filtro ... */ }
+            function alterarQuantidade(id, alteracao) { /* ... Lógica de quantidade ... */ }
+            function removerItem(id) { /* ... Lógica de remoção ... */ }
+            function limparLista() {
+                listaDeCompras.length = 0;
+                carregarLista();
+                console.log('Lista limpa');
+            }
+            function compartilharLista() { /* ... Lógica de compartilhamento ... */ }
+            function abrirOpcoesLista() { /* ... Lógica de opções ... */ }
+
+            // Previne o comportamento padrão de navegação da Navbar e usa a navegação real
+            const navElements = document.querySelectorAll('.navbar a');
+            navElements.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    if (href && href !== '#' && !link.closest('.nav-center-item')) {
+                        window.location.href = href;
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Mercados Próximos</title>
+
+    <style>
+        /* Variáveis de Cores */
+        :root {
+            --cor-fundo-app: #F4F9FA;
+            --cor-fundo-topo: #01182A;
+            --cor-texto-claro: #F4F9FA;
+            --cor-destaque-ciano: #2ED5D8;
+            --cor-destaque-amarelo: #F2B705;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #0B2C3A;
+            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transicao-padrao: all 0.3s ease;
+            --cor-aberto: #4CAF50;
+            /* Verde */
+            --cor-fechado: #e74c3c;
+            /* Vermelho */
+        }
+
+        /* Estilos Globais e Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-app);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+        }
+
+        /* --- 1. Top Section (Header) --- */
+        .top-section {
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 15px 15px 20px 15px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            padding: 5px 0 20px 0;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transicao-padrao);
+        }
+
+        .location:hover {
+            opacity: 0.8;
+        }
+
+        .location img {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .location span:last-child {
+            font-size: 1.5em;
+            margin-left: 5px;
+        }
+
+        /* ===== BARRA DE BUSCA E CONTROLES ===== */
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .control-icon {
+            background-color: var(--cor-icone-fundo-final);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .control-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background-color: #0B2C3A;
+            color: var(--cor-texto-claro);
+            font-size: 1em;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background-color: #0B2C3A;
+            box-shadow: 0 0 0 2px var(--cor-destaque-ciano);
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar img {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- 2. Lista de Mercados --- */
+        .market-list-container {
+            background-color: var(--cor-fundo-app);
+            padding: 20px 0;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 5;
+            min-height: calc(100vh - 130px);
+        }
+
+        .list-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--cor-fundo-topo);
+            margin: 0 20px 15px;
+        }
+
+        .market-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #E0E0E0;
+            cursor: pointer;
+            background-color: var(--cor-fundo-app);
+            transition: background-color 0.1s;
+        }
+
+        .market-item:hover {
+            background-color: #fff;
+        }
+
+        .market-placeholder {
+            width: 60px;
+            height: 60px;
+            background-color: #ccc;
+            border-radius: 8px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-details h4 {
+            font-size: 1.15em;
+            margin: 0;
+            color: var(--cor-fundo-topo);
+        }
+
+        .item-details p {
+            font-size: 0.9em;
+            color: #777;
+            margin: 2px 0;
+        }
+
+        .status-badge {
+            font-size: 0.8em;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .status-open {
+            background-color: var(--cor-aberto);
+            color: white;
+        }
+
+        .status-closed {
+            background-color: var(--cor-fechado);
+            color: white;
+        }
+
+        .distance {
+            font-weight: bold;
+            color: var(--cor-destaque-amarelo);
+            font-size: 1em;
+            margin-left: 10px;
+        }
+
+        /* --- 4. Navbar Inferior (Copiada) --- */
+        /* ===== NAVBAR INFERIOR ===== */
+/* Container da navbar */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 70px;
+  background: transparent;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 10;
+}
+
+        /* SVG de fundo da barra */
+        .navbar svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            display: block;
+            z-index: -1;
+        }
+
+        /* Ícones */
+        .nav-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Botão central (flutuante com brilho) */
+        .nav-center-item {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .nav-center-button {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at center, #2ed5d8 0%, #01182a 80%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px #2ed5d8, 0 0 30px rgba(46, 213, 216, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-center-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 20px #2ed5d8, 0 0 40px rgba(46, 213, 216, 0.6);
+        }
+
+        /* Ícone dentro do botão */
+        .nav-center-button img {
+            width: 150px;
+            height: 150px;
+        }
+
+        /* Itens laterais reposicionados corretamente */
+        .nav-item:nth-of-type(2) {
+            margin-right: 150px; /* espaço antes do botão central */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-area">
+        <header class="top-section">
+            <div class="location" id="location-btn">
+                <img src="img/locatizacao.png" alt="Localização">
+                <span class="location-text">Adicionar localização</span>
+                <span>&gt;</span>
+            </div>
+
+            <div class="search-controls">
+                <div class="control-icon" title="Menu" id="menu-btn">
+                    <img src="img/menu_hamburguer.png" alt="Menu">
+                </div>
+
+                <div class="search-bar" id="search-bar">
+                    <img src="img/search_white.png" alt="Buscar">
+                    <input type="text" placeholder="O que você deseja comprar?" readonly>
+                </div>
+
+                <div class="control-icon" title="Listas" id="lists-btn">
+                    <img src="img/lista_white.png" alt="Listas">
+                </div>
+
+                <div class="control-icon" title="Perfil" id="profile-btn">
+                    <img src="img/user_white.png" alt="Perfil">
+                </div>
+            </div>
+        </header>
+
+        <main class="market-list-container">
+            <h2 class="list-title">Mercados Próximos</h2>
+
+            <div class="market-item" onclick="alert('Detalhes do Mercado 1');">
+                <div class="market-placeholder">M1</div>
+                <div class="item-details">
+                    <h4>Supermercado Central</h4>
+                    <p>Avenida Principal, 123 - Centro</p>
+                    <span class="status-badge status-open">Aberto agora</span>
+                </div>
+                <div class="distance">0.8 km</div>
+            </div>
+
+            <div class="market-item" onclick="alert('Detalhes do Mercado 2');">
+                <div class="market-placeholder">M2</div>
+                <div class="item-details">
+                    <h4>Mercado Bom Preço</h4>
+                    <p>Rua das Flores, 45</p>
+                    <span class="status-badge status-closed">Fecha às 20:00</span>
+                </div>
+                <div class="distance">1.5 km</div>
+            </div>
+
+            <div class="market-item" onclick="alert('Detalhes do Mercado 3');">
+                <div class="market-placeholder">M3</div>
+                <div class="item-details">
+                    <h4>Atacadão da Cidade</h4>
+                    <p>Rodovia BR-101, Km 5</p>
+                    <span class="status-badge status-open">Aberto - Fecha em 30 min</span>
+                </div>
+                <div class="distance">4.2 km</div>
+            </div>
+
+            <div class="market-item" onclick="alert('Detalhes do Mercado 4');">
+                <div class="market-placeholder">M4</div>
+                <div class="item-details">
+                    <h4>Hortifruti Fresco</h4>
+                    <p>Travessa da Paz, 8</p>
+                    <span class="status-badge status-open">Aberto agora</span>
+                </div>
+                <div class="distance">0.3 km</div>
+            </div>
+
+            <div class="market-item" onclick="alert('Detalhes do Mercado 5');">
+                <div class="market-placeholder">M5</div>
+                <div class="item-details">
+                    <h4>Mercado Econômico</h4>
+                    <p>Rua dos Imigrantes, 99</p>
+                    <span class="status-badge status-closed">Fechado - Abre 8:00</span>
+                </div>
+                <div class="distance">2.1 km</div>
+            </div>
+
+        </main>
+    </div>
+
+    <nav class="navbar">
+        <svg width="390" height="50" viewBox="0 0 390 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M390 50H0V0H127.199C127.891 0.0148855 130.416 0.0253944 135.28 0.0253906C165.625 0.0256737 161.834 37.2663 194.59 37.2666C227.346 37.2666 223.556 0.0255408 253.9 0.0253906C258.765 0.0253878 261.29 0.0148846 261.981 0H390V50Z" fill="#0B2C3A"/>
+        </svg>
+
+
+        <a href="inicio.html" class="nav-item active">
+            <img src="img/home_barra_de_tarefa.png" alt="Início">
+        </a>
+
+        <a href="pesquisar_produto.html" class="nav-item">
+            <img src="img/lupa_barra_de_tarefa.png" alt="Busca">
+        </a>
+
+        <div class="nav-item nav-center-item">
+            <button class="nav-center-button" id="ai-button">
+                <img src="img/botao_calculo_barra_tarefa.png" alt="MercAI">
+            </button>
+        </div>
+
+        <a href="lista_de_compras.html" class="nav-item">
+            <img src="img/lista_barra_tarefa.png" alt="Listas">
+        </a>
+
+        <a href="perfil.html" class="nav-item">
+            <img src="img/user.png" alt="Perfil">
+        </a>
+    </nav>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica de navegação da Navbar, mantida para contexto
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                if (!item.querySelector('a')) return;
+
+                item.addEventListener('click', (e) => {
+                    if (item.classList.contains('nav-center-item')) return;
+
+                    // e.preventDefault(); 
+
+                    const href = item.querySelector('a').getAttribute('href');
+                    if (href && href !== '#') {
+                        // window.location.href = href; // Comentado para evitar navegação real no modelo
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

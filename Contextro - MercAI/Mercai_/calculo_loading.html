@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Calculando Preços</title>
+
+    <style>
+        /* Variáveis de Cores (Copiadas das telas anteriores) */
+        :root {
+            --cor-fundo-app: #F4F9FA;
+            --cor-fundo-topo: #01182A;
+            --cor-texto-claro: #F4F9FA;
+            --cor-destaque-ciano: #2ED5D8;
+            --cor-destaque-amarelo: #F2B705;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #0B2C3A;
+            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transicao-padrao: all 0.3s ease;
+        }
+
+        /* Estilos Globais e Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            background-color: var(--cor-fundo-topo);
+            /* Fundo ESCURO durante o loading */
+            overflow: hidden;
+        }
+
+        /* --- ESTILOS DO LOADING --- */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--cor-fundo-topo);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        #loading-icon-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at center, #2ed5d8 0%, #01182a 80%);
+            box-shadow: 0 0 15px #2ed5d8, 0 0 30px rgba(46, 213, 216, 0.5);
+        }
+
+        #loading-icon-container img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            animation: rotate 1.5s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            color: var(--cor-texto-claro);
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        /* --- RESULTADOS (Apenas para garantir que não haja conteúdo visível) --- */
+        #results-screen {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="loading-screen">
+        <div id="loading-icon-container">
+            <img src="img/botao_calculo_barra_tarefa.png" alt="Calculando">
+        </div>
+        <p class="loading-text">Analisando preços em sua região...</p>
+    </div>
+
+    <div id="results-screen"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+
+            // Simula um processo de cálculo de 3 segundos
+            const DURACAO_CALCULO = 3000;
+
+            setTimeout(() => {
+                // 1. Inicia o fade-out do loading
+                loadingScreen.style.opacity = '0';
+
+                // 2. Após o fade-out, esconde o loading e redireciona para a lista
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+
+                    // AÇÃO CORRIGIDA: Redirecionar para a lista de compras
+                    window.location.href = 'lista_de_compras.html';
+
+                }, 500); // 500ms é o tempo da transição de opacidade
+
+            }, DURACAO_CALCULO);
+
+            // A navegação da navbar é irrelevante nesta tela, pois ela é uma tela de transição.
+        });
+    </script>
+
+</body>
+
+</html>

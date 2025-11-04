@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Planos Premium</title>
+
+    <style>
+        /* Variáveis de Cores (Copiadas das telas anteriores) */
+        :root {
+            --cor-fundo-app: #f0f2f5;
+            --cor-fundo-topo: #0b1a2b;
+            /* Azul Escuro */
+            --cor-texto-claro: #E0E0E0;
+            --cor-destaque-ciano: #00bcd4;
+            --cor-destaque-amarelo: #fbbc05;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-card-fundo: #1a2a3a;
+            /* Fundo escuro para os cards */
+        }
+
+        /* Estilos Globais e Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-topo);
+            /* Fundo ESCURO para a página de Planos */
+            color: var(--cor-texto-claro);
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+            /* Espaço para a Navbar */
+        }
+
+        /* --- 1. Top Section (Header Simplificado com Seta Voltar) --- */
+        .header {
+            padding: 25px 15px 30px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-button {
+            font-size: 1.5em;
+            color: var(--cor-texto-claro);
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .header h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* --- 2. Container de Planos --- */
+        .plans-container {
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 500px;
+            /* Centraliza em telas maiores */
+            margin: 0 auto;
+        }
+
+        .plan-card {
+            background-color: var(--cor-card-fundo);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .plan-card.highlight {
+            border-color: var(--cor-destaque-amarelo);
+            transform: scale(1.05);
+        }
+
+        .plan-card h3 {
+            color: var(--cor-destaque-ciano);
+            margin-bottom: 5px;
+            font-size: 1.4em;
+        }
+
+        .plan-card .price {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--cor-destaque-amarelo);
+            margin-bottom: 10px;
+        }
+
+        .plan-card .period {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .features-list {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #3a4a5a;
+            display: flex;
+            align-items: center;
+        }
+
+        .features-list li::before {
+            content: '✔';
+            color: var(--cor-aberto);
+            /* Verde para check */
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* Botão de Assinatura */
+        .btn-subscribe {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--cor-destaque-amarelo);
+            color: #333;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- 4. Navbar Inferior (Mantida) --- */
+        .navbar {
+            /* Navbar no footer permanece inalterada */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: var(--cor-fundo-topo);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 10px;
+            z-index: 1000;
+        }
+
+        /* [ ... Estilos da Navbar do inicio.html, sem alterações ... ] */
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--cor-destaque-ciano);
+            font-size: 0.7em;
+            min-width: 20%;
+            width: 45px;
+            height: 45px;
+            justify-content: center;
+        }
+
+        .nav-item img {
+            width: 30px;
+            height: 30px;
+            filter: invert(56%) sepia(91%) saturate(2465%) hue-rotate(167deg) brightness(101%) contrast(101%);
+            margin-bottom: 0px;
+        }
+
+        .nav-item:not(.nav-center-item) .nav-text {
+            display: none;
+        }
+
+        .nav-item.active {
+            background-color: transparent;
+            border-radius: 0;
+            width: auto;
+            height: auto;
+            transform: none;
+        }
+
+        .nav-item.active img {
+            filter: invert(79%) sepia(74%) saturate(840%) hue-rotate(352deg) brightness(104%) contrast(97%);
+        }
+
+        .nav-center-item {
+            position: relative;
+            width: 80px;
+            height: 70px;
+        }
+
+        .nav-center-item::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: transparent;
+            box-shadow: 0 0 0 1000px var(--cor-fundo-topo), inset 0 0 0 1000px var(--cor-fundo-app), 0 0 0 1000px var(--cor-fundo-app);
+            clip-path: circle(40px at 50% 50%);
+        }
+
+        .nav-center-button {
+            background-color: transparent;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -110%);
+            box-shadow: none;
+            z-index: 10;
+            border: none;
+            overflow: visible;
+        }
+
+        .nav-center-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0;
+            filter: none;
+            animation: rotate 10s linear infinite;
+            transform: none;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-area">
+        <header class="header">
+            <a href="perfil.html" class="back-button">&#x2190;</a>
+            <h2>Escolha seu Plano Premium</h2>
+        </header>
+
+        <main class="plans-container">
+
+            <div class="plan-card">
+                <h3>Plano Mensal</h3>
+                <div class="price">R$ 19,90</div>
+                <div class="period">por mês</div>
+
+                <ul class="features-list">
+                    <li>Sem anúncios</li>
+                    <li>Sugestões Ilimitadas de IA</li>
+                    <li>Suporte Prioritário</li>
+                </ul>
+
+                <button class="btn-subscribe" onclick="alert('Assinar Plano Mensal');">
+                    Assinar
+                </button>
+            </div>
+
+            <div class="plan-card highlight">
+                <h3>Plano Anual</h3>
+                <div class="price">R$ 199,90</div>
+                <div class="period">por ano (Economize 15%)</div>
+
+                <ul class="features-list">
+                    <li>Sem anúncios</li>
+                    <li>Sugestões Ilimitadas de IA</li>
+                    <li>Suporte Prioritário</li>
+                    <li>Acesso a Novos Recursos Beta</li>
+                </ul>
+
+                <button class="btn-subscribe" onclick="alert('Assinar Plano Anual');">
+                    Assinar Agora
+                </button>
+            </div>
+
+        </main>
+
+    </div>
+
+    <nav class="navbar">
+        <a href="inicio.html" class="nav-item"> <img src="img/home_barra_de_tarefa.png" alt="Início"> </a>
+        <a href="pesquisar_produto.html" class="nav-item"> <img src="img/lupa_barra_de_tarefa.png" alt="Busca"> </a>
+        <div class="nav-item nav-center-item"> <a href="#" class="nav-center-button"> <img
+                    src="img/botao_calculo_barra_tarefa.png" alt="MercAI"> </a> </div>
+        <a href="listas.html" class="nav-item"> <img src="img/lista_barra_tarefa.png" alt="Listas"> </a>
+        <a href="perfil.html" class="nav-item"> <img src="img/user.png" alt="Perfil"> </a>
+    </nav>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica de navegação da Navbar e clique no botão central (mantida)
+        });
+    </script>
+
+</body>
+
+</html>

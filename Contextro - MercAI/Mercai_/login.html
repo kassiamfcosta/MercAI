@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Login/Cadastro</title>
+
+    <style>
+        /* [ ... CSS Styles mantidos para responsividade ... ] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .top-section {
+            background-color: #0b1a2b;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #E0E0E0;
+            height: 35vh;
+            min-height: 200px;
+        }
+
+        .top-section img {
+            width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .top-section h1 {
+            font-size: 2.2em;
+            color: #00bcd4;
+            margin-top: 5px;
+        }
+
+        .form-container {
+            flex-grow: 1;
+            background-color: #f0f2f5;
+            padding: 30px 20px;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            margin-top: -20px;
+            position: relative;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            background-color: #fff;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #00bcd4;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background-color: #fbbc05;
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6a700;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .secondary-text {
+            font-size: 1em;
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        @media (max-width: 480px) {
+            .top-section {
+                padding: 30px 15px;
+                min-height: 180px;
+            }
+
+            .top-section img {
+                width: 80px;
+            }
+
+            .top-section h1 {
+                font-size: 2em;
+            }
+
+            .form-container {
+                padding: 25px 15px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .input-field,
+            .btn {
+                padding: 12px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-section">
+        <img src="img/Logo.png" alt="Logo MercAI - Carrinho e Localização Digital">
+    </div>
+
+    <div class="form-container">
+        <h2>Faça login na sua conta</h2>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="E-mail" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Senha" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="loginButton">
+                Entrar
+            </button>
+        </form>
+
+        <h2 class="secondary-text">Não possui cadastro?</h2>
+
+        <button type="button" class="btn btn-primary" id="registerButton"
+            onclick="window.location.href = 'cadastro.html';">
+            Cadastrar
+        </button>
+    </div>
+
+    <!-- Scripts necessários -->
+    <script src="API_CONFIG.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const form = document.getElementById('loginForm');
+            const loginButton = document.getElementById('loginButton');
+
+            // Verificar se já está autenticado
+            if (window.Auth && window.Auth.redirectIfAuthenticated()) {
+                return;
+            }
+
+            // Verificar se há mensagem de sessão expirada
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('expired') === 'true') {
+                alert('Sua sessão expirou. Faça login novamente.');
+            }
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
+                // Validação básica
+                if (!email || !password) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                // Desabilitar botão e mostrar loading
+                loginButton.disabled = true;
+                loginButton.textContent = 'Entrando...';
+
+                try {
+                    // Fazer login via API
+                    const response = await window.api.login(email, password);
+
+                    if (response.success) {
+                        const userName = response.data?.user?.name || email;
+                        
+                        // Salvar token e dados do usuário
+                        if (response.data?.token) {
+                            localStorage.setItem('token', response.data.token);
+                        }
+                        if (response.data?.user) {
+                            localStorage.setItem('user', JSON.stringify(response.data.user));
+                        }
+                        
+                        // Mensagem de boas-vindas
+                        alert(`Bem-vindo, ${userName}! Redirecionando para o Início.`);
+                        
+                        // Redirecionar para página inicial ou redirect param
+                        const redirect = urlParams.get('redirect');
+                        window.location.href = redirect || 'inicio.html';
+                    } else {
+                        // Construir mensagem de erro detalhada
+                        let errorMessage = response.message || 'Email ou senha inválidos.';
+                        
+                        // Se houver erros de validação detalhados, adicionar ao final da mensagem
+                        if (response.errors) {
+                            const errorDetails = Object.entries(response.errors)
+                                .map(([field, messages]) => {
+                                    const fieldName = field === 'password' ? 'Senha' : 
+                                                     field === 'email' ? 'E-mail' : field;
+                                    const msgs = Array.isArray(messages) ? messages : [messages];
+                                    return `${fieldName}: ${msgs.join(', ')}`;
+                                })
+                                .join('\n');
+                            
+                            if (errorDetails) {
+                                errorMessage += '\n\nDetalhes:\n' + errorDetails;
+                            }
+                        }
+                        
+                        alert(errorMessage);
+                    }
+                } catch (error) {
+                    console.error('Erro no login:', error);
+                    
+                    // Tratar erro de resposta HTTP (ex: 400, 401, 500)
+                    let errorMessage = 'Erro ao fazer login.';
+                    
+                    // Verificar se o erro tem response.data (vem do api.js melhorado)
+                    const errorData = error.response?.data || error;
+                    
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+                    
+                    // Adicionar detalhes de validação se existirem (vem do backend)
+                    const validationErrors = errorData.errors || error.errors;
+                    if (validationErrors) {
+                        const errorDetails = Object.entries(validationErrors)
+                            .map(([field, messages]) => {
+                                const fieldName = field === 'password' ? 'Senha' : 
+                                                 field === 'email' ? 'E-mail' : field;
+                                const msgs = Array.isArray(messages) ? messages : [messages];
+                                return `${fieldName}: ${msgs.join(', ')}`;
+                            })
+                            .join('\n');
+                        
+                        if (errorDetails) {
+                            errorMessage += '\n\nDetalhes:\n' + errorDetails;
+                        }
+                    }
+                    
+                    // Se for erro de rede ou timeout, adicionar mensagem específica
+                    if (error.isNetworkError || error.isTimeout) {
+                        errorMessage += '\n\nVerifique sua conexão e tente novamente.';
+                    } else if (!validationErrors) {
+                        errorMessage += '\n\nVerifique suas credenciais e tente novamente.';
+                    }
+                    
+                    alert(errorMessage);
+                } finally {
+                    // Reabilitar botão
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Entrar';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

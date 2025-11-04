@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Pesquisar Produto</title>
+
+    <style>
+        /* ===== VARIÁVEIS E CONFIGURAÇÕES GLOBAIS ===== */
+        :root {
+            --cor-fundo-app: #F4F9FA;
+            --cor-fundo-topo: #01182A;
+            --cor-texto-claro: #F4F9FA;
+            --cor-destaque-ciano: #2ED5D8;
+            --cor-destaque-amarelo: #F2B705;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #0B2C3A;
+            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transicao-padrao: all 0.3s ease;
+        }
+
+        /* ===== RESET E ESTILOS BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-app);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+        }
+
+        /* ===== TOP SECTION (HEADER) ===== */
+        .top-section {
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--sombra-suave);
+        }
+
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .control-icon {
+            background-color: var(--cor-icone-fundo-final);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .control-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background-color: #0B2C3A;
+            color: var(--cor-texto-claro);
+            font-size: 1em;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background-color: #0B2C3A;
+            box-shadow: 0 0 0 2px var(--cor-destaque-ciano);
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar img {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main-content {
+            display: flex;
+            height: calc(100vh - 130px);
+            background-color: var(--cor-fundo-topo);
+        }
+
+        /* ===== PAINEL DE CATEGORIAS (SIDEBAR) ===== */
+        .category-sidebar {
+            width: 25%;
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 15px 0;
+            overflow-y: auto;
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+
+        .category-sidebar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 0 15px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .category-item {
+            padding: 14px 15px;
+            font-size: 0.95em;
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transicao-padrao);
+            position: relative;
+        }
+
+        .category-item:hover {
+            background-color: var(--cor-icone-fundo-final);
+        }
+
+        .category-item.active {
+            background-color: var(--cor-categoria-ativa);
+            color: var(--cor-destaque-ciano);
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            font-weight: bold;
+        }
+
+        .category-item.active::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: var(--cor-destaque-amarelo);
+        }
+
+        .category-item.ver-tudo {
+            background-color: rgba(251, 188, 5, 0.1);
+            color: var(--cor-destaque-amarelo);
+            font-weight: bold;
+            margin-top: 10px;
+            border-left: 3px solid var(--cor-destaque-amarelo);
+        }
+
+        .category-item.ver-tudo.active {
+            background-color: var(--cor-destaque-amarelo);
+            color: var(--cor-fundo-topo);
+        }
+
+        /* ===== ÁREA DE RESULTADOS ===== */
+        .results-area {
+            flex-grow: 1;
+            background-color: var(--cor-fundo-app);
+            padding: 20px;
+            overflow-y: auto;
+            border-top-left-radius: 20px;
+            margin-left: -10px;
+            z-index: 1;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .results-area h3 {
+            font-size: 1.3em;
+            margin: 20px 0 15px;
+            color: var(--cor-fundo-topo);
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .results-area h3:first-child {
+            margin-top: 0;
+        }
+
+        .search-results-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-results-title h3 {
+            margin: 0;
+        }
+
+        .result-count {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* ===== LAYOUT DE ITENS (GRID) ===== */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .product-card {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+            border: 2px solid transparent;
+            background-color: white;
+            box-shadow: var(--sombra-suave);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card.selected {
+            border: 2px solid var(--cor-destaque-amarelo);
+            box-shadow: 0 0 15px var(--cor-destaque-amarelo);
+            transform: scale(1.03);
+        }
+
+        .product-circle {
+            width: 100%;
+            padding-top: 100%;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .product-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .product-card p {
+            font-size: 0.85em;
+            margin-top: 5px;
+            color: #444;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .ver-mais {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--cor-destaque-ciano);
+            cursor: pointer;
+            padding: 10px;
+            transition: var(--transicao-padrao);
+            font-weight: 600;
+            background-color: rgba(0, 188, 212, 0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .ver-mais:hover {
+            color: var(--cor-fundo-topo);
+            background-color: rgba(0, 188, 212, 0.2);
+            text-decoration: underline;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .no-results img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* ===== INDICADOR DE SELEÇÃO ===== */
+        .selection-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--cor-destaque-amarelo);
+            color: var(--cor-fundo-topo);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: var(--sombra-suave);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-count {
+            background-color: var(--cor-fundo-topo);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        /* ===== NAVBAR INFERIOR ===== */
+        /* Container da navbar */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 70px;
+            background: transparent;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* SVG de fundo da barra */
+        .navbar svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            display: block;
+            z-index: -1;
+        }
+
+        /* Ícones */
+        .nav-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Botão central (flutuante com brilho) */
+        .nav-center-item {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .nav-center-button {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at center, #2ed5d8 0%, #01182a 80%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px #2ed5d8, 0 0 30px rgba(46, 213, 216, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-center-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 20px #2ed5d8, 0 0 40px rgba(46, 213, 216, 0.6);
+        }
+
+        /* Ícone dentro do botão */
+        .nav-center-button img {
+            width: 150px;
+            height: 150px;
+        }
+
+        /* Itens laterais reposicionados corretamente */
+        .nav-item:nth-of-type(2) {
+            margin-right: 150px; /* espaço antes do botão central */
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .category-sidebar {
+                width: 130px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                gap: 15px;
+            }
+
+            .product-card p {
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .category-sidebar {
+                width: 100%;
+                max-height: 200px;
+                padding: 10px 0;
+            }
+
+            .category-item {
+                display: inline-block;
+                padding: 10px 15px;
+                border-radius: 20px;
+                margin: 5px;
+            }
+
+            .category-item.active {
+                border-radius: 20px;
+            }
+
+            .category-item.active::before {
+                display: none;
+            }
+
+            .results-area {
+                border-top-left-radius: 0;
+                margin-left: 0;
+            }
+
+            .selection-indicator {
+                top: 15px;
+                right: 15px;
+                padding: 6px 12px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-area">
+        <header class="top-section">
+            <div class="search-controls">
+                <div class="control-icon" title="Voltar" onclick="window.history.back()">
+                    <img src="img/menu_hamburguer.png" alt="opções">
+                </div>
+
+                <div class="search-bar">
+                    <img src="img/search_white.png" alt="Buscar">
+                    <input type="text" id="search-input" placeholder="Procurar por um produto">
+                </div>
+
+                <div class="control-icon" title="Perfil" onclick="window.location.href='perfil.html'">
+                    <img src="img/user_white.png" alt="Perfil">
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="category-sidebar">
+                <h3 class="category-title">Categorias</h3>
+                <div class="category-item ver-tudo active" data-category="todos">Ver Tudo</div>
+                <div class="category-item" data-category="comida">Comida</div>
+                <div class="category-item" data-category="limpeza">Limpeza</div>
+                <div class="category-item" data-category="vestuario">Vestuário</div>
+                <div class="category-item" data-category="farmacia">Farmácia</div>
+                <div class="category-item" data-category="decoracao">Decoração</div>
+                <div class="category-item" data-category="marcenaria">Marcenaria</div>
+                <div class="category-item" data-category="botanica">Botânica</div>
+                <div class="category-item" data-category="higiene">Higiêne</div>
+                <div class="category-item" data-category="papelaria">Papelaria</div>
+                <div class="category-item" data-category="ferramentas">Ferramentas</div>
+            </aside>
+
+            <section class="results-area">
+                <!-- Conteúdo será carregado dinamicamente via JavaScript -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Indicador de produtos selecionados -->
+    <div class="selection-indicator" id="selection-indicator" style="display: none;">
+        <span class="selection-count" id="selected-count">0</span>
+        produtos selecionados
+    </div>
+
+    <nav class="navbar">
+        <svg width="390" height="50" viewBox="0 0 390 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M390 50H0V0H127.199C127.891 0.0148855 130.416 0.0253944 135.28 0.0253906C165.625 0.0256737 161.834 37.2663 194.59 37.2666C227.346 37.2666 223.556 0.0255408 253.9 0.0253906C258.765 0.0253878 261.29 0.0148846 261.981 0H390V50Z" fill="#0B2C3A"/>
+        </svg>
+
+
+        <a href="inicio.html" class="nav-item active">
+            <img src="img/home_barra_de_tarefa.png" alt="Início">
+        </a>
+
+        <a href="pesquisar_produto.html" class="nav-item">
+            <img src="img/lupa_barra_de_tarefa.png" alt="Busca">
+        </a>
+
+        <div class="nav-item nav-center-item">
+            <button class="nav-center-button" id="ai-button">
+                <img src="img/botao_calculo_barra_tarefa.png" alt="MercAI">
+            </button>
+        </div>
+
+        <a href="lista_de_compras.html" class="nav-item">
+            <img src="img/lista_barra_tarefa.png" alt="Listas">
+        </a>
+
+        <a href="perfil.html" class="nav-item">
+            <img src="img/user.png" alt="Perfil">
+        </a>
+    </nav>
+
+    <script>
+        // Dados de produtos por categoria
+        const produtosPorCategoria = {
+            comida: [
+                { id: 1, nome: "Banana Prata", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta fresca e nutritiva" },
+                { id: 2, nome: "Maçã Fuji", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta crocante e doce" },
+                { id: 3, nome: "Manga Tommy", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta tropical saborosa" },
+                { id: 4, nome: "Melão Gália", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta refrescante" },
+                { id: 5, nome: "Pêra Williams", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta suculenta" },
+                { id: 6, nome: "Uva Thompson", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Uva sem sementes" },
+                { id: 7, nome: "Laranja Pera", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Cítrica e suculenta" },
+                { id: 8, nome: "Abacaxi", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Fruta tropical" },
+                { id: 9, nome: "Morango", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Vermelho e doce" },
+                { id: 10, nome: "Melancia", imagem: "img/pitaia.jpeg", categoria: "comida", descricao: "Refrescante" }
+            ],
+            limpeza: [
+                { id: 11, nome: "Detergente Neutro", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Limpeza eficiente para louças" },
+                { id: 12, nome: "Sabão em Pó", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Para roupas brancas e coloridas" },
+                { id: 13, nome: "Água Sanitária", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Desinfetante potente" },
+                { id: 14, nome: "Desinfetante", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Elimina germes e bactérias" },
+                { id: 15, nome: "Lustra Móveis", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Brilho e proteção" },
+                { id: 16, nome: "Esponja Dupla", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Para limpeza pesada" },
+                { id: 17, nome: "Sabão Líquido", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Para roupas delicadas" },
+                { id: 18, nome: "Amaciante", imagem: "img/pitaia.jpeg", categoria: "limpeza", descricao: "Deixa as roupas macias" }
+            ],
+            vestuario: [
+                { id: 19, nome: "Meia Cano Alto", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Conforto para o dia a dia" },
+                { id: 20, nome: "Camiseta Branca", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Tecido 100% algodão" },
+                { id: 21, nome: "Calça Jeans", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Modelo reto" },
+                { id: 22, nome: "Blusa de Moletom", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Conforto e estilo" },
+                { id: 23, nome: "Shorts Esportivo", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Para atividades físicas" },
+                { id: 24, nome: "Vestido Floral", imagem: "img/pitaia.jpeg", categoria: "vestuario", descricao: "Estampado e elegante" }
+            ],
+            farmacia: [
+                { id: 25, nome: "Paracetamol", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "Analgésico e antitérmico" },
+                { id: 26, nome: "Ibuprofeno", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "Anti-inflamatório" },
+                { id: 27, nome: "Curativo Adesivo", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "Proteção para ferimentos" },
+                { id: 28, nome: "Protetor Solar", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "FPS 50" },
+                { id: 29, nome: "Vitamina C", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "Suplemento vitamínico" },
+                { id: 30, nome: "Xarope para Tosse", imagem: "img/pitaia.jpeg", categoria: "farmacia", descricao: "Alívio da tosse" }
+            ],
+            decoracao: [
+                { id: 31, nome: "Vaso Decorativo", imagem: "img/pitaia.jpeg", categoria: "decoracao", descricao: "Cerâmica artesanal" },
+                { id: 32, nome: "Quadro Abstrato", imagem: "img/pitaia.jpeg", categoria: "decoracao", descricao: "Arte moderna" },
+                { id: 33, nome: "Luminária de Mesa", imagem: "img/pitaia.jpeg", categoria: "decoracao", descricao: "Iluminação ambiente" },
+                { id: 34, nome: "Tapete Oriental", imagem: "img/pitaia.jpeg", categoria: "decoracao", descricao: "Design tradicional" },
+                { id: 35, nome: "Almofada Estampada", imagem: "img/pitaia.jpeg", categoria: "decoracao", descricao: "Conforto e estilo" }
+            ],
+            marcenaria: [
+                { id: 36, nome: "Tábua de Pinus", imagem: "img/pitaia.jpeg", categoria: "marcenaria", descricao: "Madeira para projetos" },
+                { id: 37, nome: "Parafuso 3x20", imagem: "img/pitaia.jpeg", categoria: "marcenaria", descricao: "Aço inox" },
+                { id: 38, nome: "Cola para Madeira", imagem: "img/pitaia.jpeg", categoria: "marcenaria", descricao: "Adesivo resistente" },
+                { id: 39, nome: "Lixa Nº 120", imagem: "img/pitaia.jpeg", categoria: "marcenaria", descricao: "Para acabamento" },
+                { id: 40, nome: "Verniz Brilhante", imagem: "img/pitaia.jpeg", categoria: "marcenaria", descricao: "Proteção e brilho" }
+            ],
+            botanica: [
+                { id: 41, nome: "Vaso de Cerâmica", imagem: "img/pitaia.jpeg", categoria: "botanica", descricao: "Para plantas" },
+                { id: 42, nome: "Semente de Girassol", imagem: "img/pitaia.jpeg", categoria: "botanica", descricao: "Para cultivo" },
+                { id: 43, nome: "Adubo Orgânico", imagem: "img/pitaia.jpeg", categoria: "botanica", descricao: "Nutrientes para plantas" },
+                { id: 44, nome: "Terra Vegetal", imagem: "img/pitaia.jpeg", categoria: "botanica", descricao: "Substrato fértil" },
+                { id: 45, nome: "Regador Plástico", imagem: "img/pitaia.jpeg", categoria: "botanica", descricao: "2 litros" }
+            ],
+            higiene: [
+                { id: 46, nome: "Escova de Dentes", imagem: "img/pitaia.jpeg", categoria: "higiene", descricao: "Cerdas macias" },
+                { id: 47, nome: "Pasta Dental", imagem: "img/pitaia.jpeg", categoria: "higiene", descricao: "Proteção contra cáries" },
+                { id: 48, nome: "Fio Dental", imagem: "img/pitaia.jpeg", categoria: "higiene", descricao: "Limpeza interdental" },
+                { id: 49, nome: "Sabonete Líquido", imagem: "img/pitaia.jpeg", categoria: "higiene", descricao: "Limpeza suave" },
+                { id: 50, nome: "Shampoo Anticaspa", imagem: "img/pitaia.jpeg", categoria: "higiene", descricao: "Controle de caspa" }
+            ],
+            papelaria: [
+                { id: 51, nome: "Caderno Universitário", imagem: "img/pitaia.jpeg", categoria: "papelaria", descricao: "96 folhas" },
+                { id: 52, nome: "Caneta Esferográfica", imagem: "img/pitaia.jpeg", categoria: "papelaria", descricao: "Ponta média" },
+                { id: 53, nome: "Lápis HB", imagem: "img/pitaia.jpeg", categoria: "papelaria", descricao: "Grafite padrão" },
+                { id: 54, nome: "Borracha Branca", imagem: "img/pitaia.jpeg", categoria: "papelaria", descricao: "Apaga limpo" },
+                { id: 55, nome: "Apontador", imagem: "img/pitaia.jpeg", categoria: "papelaria", descricao: "Com depósito" }
+            ],
+            ferramentas: [
+                { id: 56, nome: "Martelo de Garra", imagem: "img/pitaia.jpeg", categoria: "ferramentas", descricao: "Aço temperado" },
+                { id: 57, nome: "Chave de Fenda", imagem: "img/pitaia.jpeg", categoria: "ferramentas", descricao: "Ponta Phillips" },
+                { id: 58, nome: "Alicate Universal", imagem: "img/pitaia.jpeg", categoria: "ferramentas", descricao: "Multiuso" },
+                { id: 59, nome: "Furadeira 500W", imagem: "img/pitaia.jpeg", categoria: "ferramentas", descricao: "Com velocidades variáveis" },
+                { id: 60, nome: "Broca para Concreto", imagem: "img/pitaia.jpeg", categoria: "ferramentas", descricao: "6mm" }
+            ]
+        };
+
+        // Variável global para armazenar os produtos selecionados
+        let selectedProducts = [];
+        // Variável para controlar quantos produtos são exibidos por categoria
+        const produtosPorPagina = 6;
+        // Variável para armazenar o estado atual (categoria ou pesquisa)
+        let estadoAtual = {
+            tipo: 'categoria',
+            valor: 'todos'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const categoryItems = document.querySelectorAll('.category-item');
+            const resultsArea = document.querySelector('.results-area');
+            const searchInput = document.getElementById('search-input');
+            const selectionIndicator = document.getElementById('selection-indicator');
+            const selectedCount = document.getElementById('selected-count');
+            const aiSuggestionsBtn = document.getElementById('ai-suggestions-btn');
+
+            // Carrega a categoria ativa inicial (Ver Tudo)
+            carregarCategoria('todos');
+
+            // Adiciona funcionalidade de clique aos itens de categoria
+            categoryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const categoria = item.getAttribute('data-category');
+
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+
+                    estadoAtual = { tipo: 'categoria', valor: categoria };
+                    carregarCategoria(categoria);
+                });
+            });
+
+            // Adiciona funcionalidade de pesquisa em tempo real
+            searchInput.addEventListener('input', (e) => {
+                const termoPesquisa = e.target.value.trim().toLowerCase();
+
+                if (termoPesquisa.length > 0) {
+                    estadoAtual = { tipo: 'pesquisa', valor: termoPesquisa };
+                    realizarPesquisa(termoPesquisa);
+                } else {
+                    // Se a pesquisa estiver vazia, volta para a categoria ativa
+                    const categoriaAtiva = document.querySelector('.category-item.active').getAttribute('data-category');
+                    estadoAtual = { tipo: 'categoria', valor: categoriaAtiva };
+                    carregarCategoria(categoriaAtiva);
+                }
+            });
+
+            // Adiciona funcionalidade ao botão MercAI (giratório)
+            aiSuggestionsBtn.addEventListener('click', () => {
+                // Se há produtos selecionados, adiciona à lista e redireciona
+                if (selectedProducts.length > 0) {
+                    adicionarProdutosALista();
+                } else {
+                    // Se não há produtos selecionados, apenas redireciona para a lista
+                    window.location.href = 'lista_de_compras.html';
+                }
+            });
+
+            // Função para carregar produtos de uma categoria
+            function carregarCategoria(categoria) {
+                let produtos = [];
+                let titulo = '';
+
+                if (categoria === 'todos') {
+                    // Carrega produtos de todas as categorias
+                    titulo = 'Todos os Produtos';
+                    Object.values(produtosPorCategoria).forEach(catProdutos => {
+                        produtos = produtos.concat(catProdutos.slice(0, produtosPorPagina));
+                    });
+                } else {
+                    // Carrega produtos de uma categoria específica
+                    produtos = produtosPorCategoria[categoria] || [];
+                    titulo = document.querySelector(`.category-item[data-category="${categoria}"]`).textContent;
+                }
+
+                // Limpa a área de resultados
+                resultsArea.innerHTML = '';
+
+                // Adiciona o título da categoria
+                const tituloElemento = document.createElement('h3');
+                tituloElemento.textContent = titulo;
+                resultsArea.appendChild(tituloElemento);
+
+                if (produtos.length === 0) {
+                    exibirSemResultados();
+                    return;
+                }
+
+                // Cria o grid de produtos
+                const grid = document.createElement('div');
+                grid.className = 'results-grid';
+
+                // Adiciona os produtos
+                produtos.forEach(produto => {
+                    const card = criarCardProduto(produto);
+                    grid.appendChild(card);
+                });
+
+                resultsArea.appendChild(grid);
+
+                // Adiciona o botão "Ver mais" se houver mais produtos (apenas para categorias específicas)
+                if (categoria !== 'todos' && produtosPorCategoria[categoria].length > produtosPorPagina) {
+                    const verMaisBtn = document.createElement('div');
+                    verMaisBtn.className = 'ver-mais';
+                    verMaisBtn.textContent = 'Ver mais';
+                    verMaisBtn.setAttribute('data-categoria', categoria);
+                    verMaisBtn.addEventListener('click', () => verMaisProdutos(categoria));
+                    resultsArea.appendChild(verMaisBtn);
+                }
+            }
+
+            // Função para realizar pesquisa
+            function realizarPesquisa(termo) {
+                const resultados = [];
+
+                // Procura o termo em todos os produtos
+                Object.values(produtosPorCategoria).forEach(catProdutos => {
+                    catProdutos.forEach(produto => {
+                        if (produto.nome.toLowerCase().includes(termo)) {
+                            resultados.push(produto);
+                        }
+                    });
+                });
+
+                // Limpa a área de resultados
+                resultsArea.innerHTML = '';
+
+                // Adiciona o título da pesquisa
+                const tituloContainer = document.createElement('div');
+                tituloContainer.className = 'search-results-title';
+
+                const titulo = document.createElement('h3');
+                titulo.textContent = `Resultados para "${termo}"`;
+
+                const contador = document.createElement('span');
+                contador.className = 'result-count';
+                contador.textContent = `${resultados.length} produto(s) encontrado(s)`;
+
+                tituloContainer.appendChild(titulo);
+                tituloContainer.appendChild(contador);
+                resultsArea.appendChild(tituloContainer);
+
+                if (resultados.length === 0) {
+                    exibirSemResultados();
+                    return;
+                }
+
+                // Cria o grid de produtos
+                const grid = document.createElement('div');
+                grid.className = 'results-grid';
+
+                // Adiciona os produtos encontrados
+                resultados.forEach(produto => {
+                    const card = criarCardProduto(produto);
+                    grid.appendChild(card);
+                });
+
+                resultsArea.appendChild(grid);
+            }
+
+            // Função para exibir mensagem quando não há resultados
+            function exibirSemResultados() {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+
+                noResults.innerHTML = `
+                    <img src="img/lupa_barra_de_tarefa.png" alt="Nenhum resultado">
+                    <h3>Nenhum produto encontrado</h3>
+                    <p>Tente usar outros termos de pesquisa ou navegar pelas categorias.</p>
+                `;
+
+                resultsArea.appendChild(noResults);
+            }
+
+            // Função para criar um card de produto
+            function criarCardProduto(produto) {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.setAttribute('data-id', produto.id);
+
+                const circle = document.createElement('div');
+                circle.className = 'product-circle';
+
+                const img = document.createElement('img');
+                img.src = produto.imagem;
+                img.alt = produto.nome;
+
+                const nome = document.createElement('p');
+                nome.textContent = produto.nome;
+
+                circle.appendChild(img);
+                card.appendChild(circle);
+                card.appendChild(nome);
+
+                // Verifica se o produto já está selecionado
+                if (selectedProducts.some(p => p.id === produto.id)) {
+                    card.classList.add('selected');
+                }
+
+                // Adiciona funcionalidade de seleção
+                card.addEventListener('click', () => {
+                    selecionarProduto(card, produto);
+                });
+
+                return card;
+            }
+
+            // Função para selecionar/desselecionar produto
+            function selecionarProduto(card, produto) {
+                const index = selectedProducts.findIndex(p => p.id === produto.id);
+
+                if (card.classList.contains('selected')) {
+                    // Desselecionar
+                    card.classList.remove('selected');
+                    if (index > -1) {
+                        selectedProducts.splice(index, 1);
+                    }
+                    console.log(`Produto removido: ${produto.nome}`);
+                } else {
+                    // Selecionar
+                    card.classList.add('selected');
+                    if (index === -1) {
+                        selectedProducts.push(produto);
+                    }
+                    console.log(`Produto adicionado: ${produto.nome}`);
+                }
+
+                // Atualiza o indicador de seleção
+                atualizarIndicadorSelecao();
+
+                console.log('Produtos Selecionados Atualmente:', selectedProducts);
+            }
+
+            // Função para atualizar o indicador de seleção
+            function atualizarIndicadorSelecao() {
+                const count = selectedProducts.length;
+                selectedCount.textContent = count;
+
+                if (count > 0) {
+                    selectionIndicator.style.display = 'flex';
+                } else {
+                    selectionIndicator.style.display = 'none';
+                }
+            }
+
+            // Função para adicionar produtos à lista
+            function adicionarProdutosALista() {
+                if (selectedProducts.length === 0) {
+                    alert('Selecione pelo menos um produto para adicionar à lista.');
+                    return;
+                }
+
+                // Salva os produtos selecionados no localStorage
+                const listaExistente = JSON.parse(localStorage.getItem('listaDeCompras') || '[]');
+
+                // Adiciona apenas produtos que ainda não estão na lista
+                selectedProducts.forEach(produto => {
+                    const produtoExistente = listaExistente.find(item => item.id === produto.id);
+                    if (!produtoExistente) {
+                        listaExistente.push({
+                            ...produto,
+                            quantidade: 1
+                        });
+                    }
+                });
+
+                localStorage.setItem('listaDeCompras', JSON.stringify(listaExistente));
+
+                // Feedback para o usuário
+                alert(`${selectedProducts.length} produto(s) adicionado(s) à lista!`);
+
+                // Limpa a seleção
+                selectedProducts = [];
+                document.querySelectorAll('.product-card.selected').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                atualizarIndicadorSelecao();
+
+                // Redireciona para a lista de compras
+                window.location.href = 'lista_de_compras.html';
+            }
+
+            // Função para carregar mais produtos
+            function verMaisProdutos(categoria) {
+                const produtos = produtosPorCategoria[categoria] || [];
+                const verMaisBtn = document.querySelector(`.ver-mais[data-categoria="${categoria}"]`);
+
+                // Remove o botão "Ver mais"
+                if (verMaisBtn) {
+                    verMaisBtn.remove();
+                }
+
+                // Encontra o grid de produtos existente
+                const grid = document.querySelector('.results-grid');
+
+                // Adiciona os produtos restantes
+                const produtosRestantes = produtos.slice(produtosPorPagina);
+
+                produtosRestantes.forEach(produto => {
+                    const card = criarCardProduto(produto);
+                    grid.appendChild(card);
+                });
+            }
+
+            // Navegação - garante que todos os links funcionem
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    // Para itens que não são o botão central
+                    if (!item.classList.contains('nav-center-item')) {
+                        const href = item.getAttribute('href');
+                        if (href && href !== '#') {
+                            window.location.href = href;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

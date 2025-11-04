@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+       
+    <meta charset="UTF-8">
+       
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MercAI - Carregamento</title>
+        <style>
+        /* Estilos Globais e Reset Simples */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            /* Garante que não haja scrollbar */
+        }
+
+        /* Estilo da Splash Screen */
+        .splash-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            background-color: #0b1a2b;
+            /* Cor de fundo escura, baseada na imagem */
+            transition: opacity 0.5s ease-out;
+            /* Para uma transição suave ao sumir */
+        }
+
+        .logo-container {
+            text-align: center;
+            /* Aplicando uma animação simples para destaque */
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .logo-container img {
+            width: 150px;
+            /* Tamanho padrão para mobile */
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Responsividade (Ajuste para telas maiores, se necessário) */
+        @media (min-width: 600px) {
+            .logo-container img {
+                width: 200px;
+            }
+        }
+
+        /* Animação CSS para o fade-in */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+        <div id="splashScreen" class="splash-screen">
+                <div class="logo-container">
+                        <img src="img/Logo.png" alt="Logo MercAI - Carrinho e Localização Digital">
+                    </div>
+            </div>
+
+       
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const splash = document.getElementById('splashScreen');
+
+            // Duração que a tela de carregamento deve aparecer (em milissegundos)
+            const DURACAO_SPLASH = 2500; // 2.5 segundos
+
+            // Função para sumir com a splash screen e redirecionar
+            setTimeout(() => {
+                // 1. Inicia o efeito de 'fade-out'
+                splash.style.opacity = '0';
+
+                // 2. Após o fade-out, redireciona
+                setTimeout(() => {
+                    // CORREÇÃO APLICADA: Redireciona para o login.html
+                    window.location.href = 'login.html';
+
+                }, 500); // 500ms é o tempo da transição de opacidade definida no CSS
+
+            }, DURACAO_SPLASH);
+        });
+    </script>
+
+</body>
+
+</html>

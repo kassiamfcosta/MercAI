@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Início</title>
+
+    <style>
+        /* ===== VARIÁVEIS E CONFIGURAÇÕES GLOBAIS ===== */
+        :root {
+            --cor-fundo-app: #F4F9FA;
+            --cor-fundo-topo: #01182A;
+            --cor-texto-claro: #F4F9FA;
+            --cor-destaque-ciano: #2ED5D8;
+            --cor-destaque-amarelo: #F2B705;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #0B2C3A;
+            --sombra-suave: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transicao-padrao: all 0.3s ease;
+        }
+
+        /* ===== RESET E ESTILOS BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-app);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+        }
+
+        /* ===== TOP SECTION ===== */
+        .top-section {
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 15px 15px 0 15px;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            padding: 5px 0 20px 0;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transicao-padrao);
+        }
+
+        .location:hover {
+            opacity: 0.8;
+        }
+
+        .location img {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        .location span:last-child {
+            font-size: 1.5em;
+            margin-left: 5px;
+        }
+
+        /* ===== BARRA DE BUSCA E CONTROLES ===== */
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .control-icon {
+            background-color: var(--cor-icone-fundo-final);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .control-icon img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 12px 12px 45px;
+            border: none;
+            border-radius: 25px;
+            background-color: #0B2C3A;
+            color: var(--cor-texto-claro);
+            font-size: 1em;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            background-color: #0B2C3A;
+            box-shadow: 0 0 0 2px var(--cor-destaque-ciano);
+        }
+
+        .search-bar input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-bar img {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ===== SEÇÃO DE CATEGORIAS ===== */
+        .categories-container {
+            display: flex;
+            padding: 0 15px 20px 15px;
+            gap: 15px;
+            overflow-x: auto;
+            background-color: var(--cor-fundo-topo);
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .categories-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .category-circle {
+            width: 70px;
+            height: 70px;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            margin-bottom: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .category-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .category-text {
+            color: var(--cor-texto-claro);
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        /* ===== CONTENT BODY ===== */
+        .content-body {
+            background-color: var(--cor-fundo-app);
+            padding-top: 15px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            margin-top: -15px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--cor-fundo-topo);
+            padding: 20px 15px 10px 15px;
+            position: relative;
+        }
+
+        .horizontal-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 0 15px 20px 15px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .horizontal-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .offer-card,
+        .recent-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: var(--sombra-suave);
+            flex-shrink: 0;
+            transition: var(--transicao-padrao);
+            cursor: pointer;
+        }
+
+        .offer-card:hover,
+        .recent-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .offer-card {
+            min-width: 85vw;
+            max-width: 350px;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .offer-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recent-card {
+            min-width: 150px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-image-placeholder {
+            width: 100%;
+            height: 120px;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .recent-image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .recent-info {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 0 6px 0;
+            color: #333;
+        }
+
+        .price-section {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .price {
+            color: var(--cor-destaque-amarelo);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .old-price {
+            color: #999;
+            font-size: 13px;
+            text-decoration: line-through;
+        }
+
+        .discount {
+            background-color: var(--cor-fundo-topo);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        /* ===== NAVBAR INFERIOR ===== */
+/* Container da navbar */
+.navbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 70px;
+  background: transparent;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 10;
+}
+
+        /* SVG de fundo da barra */
+        .navbar svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            display: block;
+            z-index: -1;
+        }
+
+        /* Ícones */
+        .nav-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-item img {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-item:hover img {
+            transform: scale(1.15);
+        }
+
+        /* Botão central (flutuante com brilho) */
+        .nav-center-item {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        .nav-center-button {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: none;
+            background: radial-gradient(circle at center, #2ed5d8 0%, #01182a 80%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px #2ed5d8, 0 0 30px rgba(46, 213, 216, 0.5);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-center-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 0 20px #2ed5d8, 0 0 40px rgba(46, 213, 216, 0.6);
+        }
+
+        /* Ícone dentro do botão */
+        .nav-center-button img {
+            width: 150px;
+            height: 150px;
+        }
+
+/* Itens laterais reposicionados corretamente */
+.nav-item:nth-of-type(2) {
+  margin-right: 150px; /* espaço antes do botão central */
+}
+
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 480px) {
+            .offer-card {
+                min-width: 80vw;
+            }
+
+            .recent-card {
+                min-width: 130px;
+            }
+
+            .category-circle {
+                width: 60px;
+                height: 60px;
+            }
+
+            .category-item {
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content-area">
+        <header class="top-section">
+            <div class="location" id="location-btn">
+                <img src="img/locatizacao.png" alt="Localização">
+                <span class="location-text">Adicionar localização</span>
+                <span>&gt;</span>
+            </div>
+
+            <div class="search-controls">
+                <div class="control-icon" title="Menu" id="menu-btn">
+                    <img src="img/menu_hamburguer.png" alt="Menu">
+                </div>
+
+                <div class="search-bar" id="search-bar">
+                    <img src="img/search_white.png" alt="Buscar">
+                    <input type="text" placeholder="O que você deseja comprar?" readonly>
+                </div>
+
+                <div class="control-icon" title="Listas" id="lists-btn">
+                    <img src="img/lista_white.png" alt="Listas">
+                </div>
+
+                <div class="control-icon" title="Perfil" id="profile-btn">
+                    <img src="img/user_white.png" alt="Perfil">
+                </div>
+            </div>
+
+            <section class="categories-container">
+                <div class="category-item" data-category="frutas">
+                    <div class="category-circle"><img src="img/abacaxi.jpeg" alt="Frutas"></div>
+                    <span class="category-text">Frutas</span>
+                </div>
+                <div class="category-item" data-category="vestuario">
+                    <div class="category-circle"><img src="img/mangostao.jpeg" alt="Vestuário"></div>
+                    <span class="category-text">Vestuário</span>
+                </div>
+                <div class="category-item" data-category="limpeza">
+                    <div class="category-circle"><img src="img/pitaia.jpeg" alt="Limpeza"></div>
+                    <span class="category-text">Limpeza</span>
+                </div>
+                <div class="category-item" data-category="bebidas">
+                    <div class="category-circle"><img src="img/abacaxi.jpeg" alt="Bebidas"></div>
+                    <span class="category-text">Bebidas</span>
+                </div>
+                <div class="category-item" data-category="farmacia">
+                    <div class="category-circle"><img src="img/mangostao.jpeg" alt="Farmácia"></div>
+                    <span class="category-text">Farmácia</span>
+                </div>
+            </section>
+        </header>
+
+        <main class="content-body">
+            <h2 class="section-title">Ofertas do dia</h2>
+            <section>
+                <div class="horizontal-list">
+                    <div class="offer-card" id="offer-1">
+                        <img src="img/ofertas do dia.jpeg" alt="Oferta Especial">
+                    </div>
+                    <div class="offer-card" id="offer-2">
+                        <div
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                            Super Oferta -50%
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <h2 class="section-title">Pesquisados recentemente</h2>
+            <section>
+                <div class="horizontal-list">
+                    <div class="recent-card" data-product="abacaxi">
+                    <div class="recent-image-placeholder"><img src="img/abacaxi.jpeg" alt="Abacaxi"></div>
+                    <div class="recent-info">
+                        <h3>Abacaxi</h3>
+                        <div class="price-section">
+                        <span class="price">R$ 29,90</span>
+                        <span class="old-price">R$ 49,90</span>
+                        <span class="discount">-20%</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="recent-card" data-product="mangostao">
+                    <div class="recent-image-placeholder"><img src="img/mangostao.jpeg" alt="Mangostão"></div>
+                    <div class="recent-info">
+                        <h3>Mangostão</h3>
+                        <div class="price-section">
+                        <span class="price">R$ 29,90</span>
+                        <span class="old-price">R$ 49,90</span>
+                        <span class="discount">-20%</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="recent-card" data-product="pitaia">
+                    <div class="recent-image-placeholder"><img src="img/pitaia.jpeg" alt="Pitaia"></div>
+                    <div class="recent-info">
+                        <h3>Pitaia</h3>
+                        <div class="price-section">
+                        <span class="price">R$ 29,90</span>
+                        <span class="old-price">R$ 49,90</span>
+                        <span class="discount">-20%</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="recent-card" data-product="maca">
+                    <div class="recent-image-placeholder"><img src="img/abacaxi.jpeg" alt="Maçã"></div>
+                    <div class="recent-info">
+                        <h3>Maçã</h3>
+                        <div class="price-section">
+                        <span class="price">R$ 29,90</span>
+                        <span class="old-price">R$ 49,90</span>
+                        <span class="discount">-20%</span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </section>
+
+            <div style="height: 20px;"></div>
+        </main>
+    </div>
+
+    <nav class="navbar">
+        <svg width="390" height="50" viewBox="0 0 390 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M390 50H0V0H127.199C127.891 0.0148855 130.416 0.0253944 135.28 0.0253906C165.625 0.0256737 161.834 37.2663 194.59 37.2666C227.346 37.2666 223.556 0.0255408 253.9 0.0253906C258.765 0.0253878 261.29 0.0148846 261.981 0H390V50Z" fill="#0B2C3A"/>
+        </svg>
+
+
+        <a href="inicio.html" class="nav-item active">
+            <img src="img/home_barra_de_tarefa.png" alt="Início">
+        </a>
+
+        <a href="pesquisar_produto.html" class="nav-item">
+            <img src="img/lupa_barra_de_tarefa.png" alt="Busca">
+        </a>
+
+        <div class="nav-item nav-center-item">
+            <button class="nav-center-button" id="ai-button">
+                <img src="img/botao_calculo_barra_tarefa.png" alt="MercAI">
+            </button>
+        </div>
+
+        <a href="lista_de_compras.html" class="nav-item">
+            <img src="img/lista_barra_tarefa.png" alt="Listas">
+        </a>
+
+        <a href="perfil.html" class="nav-item">
+            <img src="img/user.png" alt="Perfil">
+        </a>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const locationBtn = document.getElementById('location-btn');
+            const searchBar = document.getElementById('search-bar');
+            const menuBtn = document.getElementById('menu-btn');
+            const listsBtn = document.getElementById('lists-btn');
+            const profileBtn = document.getElementById('profile-btn');
+            const aiButton = document.getElementById('ai-button');
+            const categoryItems = document.querySelectorAll('.category-item');
+            const recentCards = document.querySelectorAll('.recent-card');
+            const offerCards = document.querySelectorAll('.offer-card');
+
+            // Navegação da navbar
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    // Para itens que não são o botão central
+                    if (!item.classList.contains('nav-center-item')) {
+                        const href = item.getAttribute('href');
+                        if (href && href !== '#') {
+                            window.location.href = href;
+                        }
+                    }
+                });
+            });
+
+            // Botão de localização
+            locationBtn.addEventListener('click', () => {
+                window.location.href = 'mercados_proximos.html';
+            });
+
+            // Barra de busca
+            searchBar.addEventListener('click', () => {
+                window.location.href = 'pesquisar_produto.html';
+            });
+
+            // Botões de controle
+            menuBtn.addEventListener('click', () => {
+                // Simulação de menu - poderia abrir um drawer menu
+                console.log('Menu aberto');
+            });
+
+            listsBtn.addEventListener('click', () => {
+                window.location.href = 'lista_de_compras.html';
+            });
+
+            profileBtn.addEventListener('click', () => {
+                window.location.href = 'perfil.html';
+            });
+
+            // Botão MercAI
+            aiButton.addEventListener('click', () => {
+                window.location.href = 'calculo_loading.html';
+            });
+
+            // Categorias - navegação para pesquisa com filtro
+            categoryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const category = item.getAttribute('data-category');
+                    // Salva a categoria selecionada no localStorage para usar na página de pesquisa
+                    localStorage.setItem('selectedCategory', category);
+                    window.location.href = 'pesquisar_produto.html';
+                });
+            });
+
+            // Produtos recentes - navegação para pesquisa
+            recentCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const product = card.getAttribute('data-product');
+                    // Salva o produto pesquisado no localStorage
+                    localStorage.setItem('searchedProduct', product);
+                    window.location.href = 'pesquisar_produto.html';
+                });
+            });
+
+            // Ofertas - navegação para produtos em oferta
+            offerCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const offerId = card.getAttribute('id');
+                    // Simulação de navegação para oferta específica
+                    if (offerId === 'offer-1') {
+                        alert('Redirecionando para oferta especial!');
+                        // window.location.href = 'oferta_especial.html';
+                    } else if (offerId === 'offer-2') {
+                        alert('Redirecionando para super oferta!');
+                        // window.location.href = 'super_oferta.html';
+                    }
+                });
+            });
+
+            // Simulação de dados de localização (poderia vir de geolocation API)
+            function simularLocalizacao() {
+                const locations = [
+                    'São Paulo, SP',
+                    'Rio de Janeiro, RJ',
+                    'Belo Horizonte, MG',
+                    'Porto Alegre, RS'
+                ];
+                const randomLocation = locations[Math.floor(Math.random() * locations.length)];
+
+                const locationText = document.querySelector('.location-text');
+                locationText.textContent = randomLocation;
+                locationText.style.fontWeight = 'bold';
+            }
+
+            // Verifica se já tem localização salva
+            const savedLocation = localStorage.getItem('userLocation');
+            if (savedLocation) {
+                const locationText = document.querySelector('.location-text');
+                locationText.textContent = savedLocation;
+                locationText.style.fontWeight = 'bold';
+            } else {
+                // Simula uma localização para demonstração
+                simularLocalizacao();
+            }
+
+            // Adiciona funcionalidade de clique duplo para alterar localização
+            let clickCount = 0;
+            let clickTimer;
+
+            locationBtn.addEventListener('click', () => {
+                clickCount++;
+
+                if (clickCount === 1) {
+                    clickTimer = setTimeout(() => {
+                        // Clique único - vai para página de mercados
+                        window.location.href = 'mercados_proximos.html';
+                        clickCount = 0;
+                    }, 300);
+                } else if (clickCount === 2) {
+                    // Clique duplo - simula nova localização
+                    clearTimeout(clickTimer);
+                    simularLocalizacao();
+                    clickCount = 0;
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

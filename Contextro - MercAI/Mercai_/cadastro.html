@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Cadastro</title>
+
+    <style>
+        /* Estilos CSS (Sem alterações, mantendo a responsividade) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .top-section {
+            background-color: #0b1a2b;
+            padding: 40px 20px 40px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #E0E0E0;
+            height: 40vh;
+            min-height: 250px;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 30px;
+            color: #E0E0E0;
+            cursor: pointer;
+            text-decoration: none;
+            line-height: 1;
+            padding: 5px;
+        }
+
+        .back-button:active {
+            opacity: 0.7;
+        }
+
+        .top-section img {
+            width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .top-section h1 {
+            font-size: 2.2em;
+            color: #00bcd4;
+            margin-top: 5px;
+        }
+
+        .form-container {
+            flex-grow: 1;
+            background-color: #f0f2f5;
+            padding: 30px 20px;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            margin-top: -20px;
+            position: relative;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            color: #333;
+            background-color: #fff;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #00bcd4;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 188, 212, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            margin-top: 25px;
+        }
+
+        .btn-primary {
+            background-color: #fbbc05;
+            color: #333;
+        }
+
+        .btn-primary:hover {
+            background-color: #e6a700;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 480px) {
+            .top-section {
+                padding: 30px 15px;
+                min-height: 200px;
+            }
+
+            .top-section img {
+                width: 150px;
+            }
+
+            .top-section h1 {
+                font-size: 2em;
+            }
+
+            .form-container {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-section">
+        <a href="login.html" class="back-button" title="Voltar para o Login">&#x2190;</a>
+
+        <img src="img/Logo.png" alt="Logo MercAI - Carrinho e Localização Digital">
+
+    </div>
+
+    <div class="form-container">
+        <h2>Crie sua conta</h2>
+        <form id="cadastroForm">
+            <div class="input-group">
+                <input type="text" id="name" class="input-field" placeholder="Seu Nome Completo" required>
+            </div>
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="E-mail" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Senha" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="confirmPassword" class="input-field" placeholder="Confirme sua senha"
+                    required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="registerButton">
+                Cadastrar
+            </button>
+        </form>
+    </div>
+
+    <!-- Scripts necessários -->
+    <script src="API_CONFIG.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const form = document.getElementById('cadastroForm');
+            const registerButton = document.getElementById('registerButton');
+
+            // Verificar se já está autenticado
+            if (window.Auth && window.Auth.redirectIfAuthenticated()) {
+                return;
+            }
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Validações
+                if (!name || !email || !password || !confirmPassword) {
+                    alert('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                // Validação de email básica
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Por favor, insira um e-mail válido.');
+                    return;
+                }
+
+                // Validação de senha (backend requer mínimo 8 caracteres e pelo menos 1 número)
+                if (password.length < 8) {
+                    alert('A senha deve ter no mínimo 8 caracteres.');
+                    return;
+                }
+
+                // Verificar se senha contém pelo menos um número
+                if (!/\d/.test(password)) {
+                    alert('A senha deve conter pelo menos um número.');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('As senhas não coincidem.');
+                    return;
+                }
+
+                // Desabilitar botão e mostrar loading
+                registerButton.disabled = true;
+                registerButton.textContent = 'Cadastrando...';
+
+                try {
+                    // Fazer cadastro via API
+                    const userData = {
+                        name: name,
+                        email: email,
+                        password: password
+                    };
+
+                    const response = await window.api.register(userData);
+
+                    if (response.success) {
+                        const userName = response.data?.user?.name || name;
+                        
+                        // Salvar token e dados do usuário
+                        if (response.data?.token) {
+                            localStorage.setItem('token', response.data.token);
+                        }
+                        if (response.data?.user) {
+                            localStorage.setItem('user', JSON.stringify(response.data.user));
+                        }
+                        
+                        alert(`Cadastro realizado com sucesso! Bem-vindo, ${userName}!`);
+                        
+                        // Redirecionar para página inicial (usuário já está logado)
+                        window.location.href = 'inicio.html';
+                    } else {
+                        // Construir mensagem de erro detalhada
+                        let errorMessage = response.message || 'Erro ao realizar cadastro.';
+                        
+                        // Se houver erros de validação detalhados, adicionar ao final da mensagem
+                        if (response.errors) {
+                            const errorDetails = Object.entries(response.errors)
+                                .map(([field, messages]) => {
+                                    const fieldName = field === 'password' ? 'Senha' : 
+                                                     field === 'email' ? 'E-mail' : 
+                                                     field === 'name' ? 'Nome' : field;
+                                    const msgs = Array.isArray(messages) ? messages : [messages];
+                                    return `${fieldName}: ${msgs.join(', ')}`;
+                                })
+                                .join('\n');
+                            
+                            if (errorDetails) {
+                                errorMessage += '\n\nDetalhes:\n' + errorDetails;
+                            }
+                        }
+                        
+                        // Verificar se é erro de email duplicado
+                        if (response.message && (response.message.includes('já cadastrado') || response.message.includes('já existe'))) {
+                            alert(errorMessage + '\n\nTente fazer login ou use outro e-mail.');
+                            window.location.href = 'login.html';
+                        } else {
+                            alert(errorMessage);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Erro no cadastro:', error);
+                    
+                    // Tratar erro de resposta HTTP (ex: 400, 409, 500)
+                    let errorMessage = 'Erro ao realizar cadastro.';
+                    
+                    // Verificar se o erro tem response.data (vem do api.js melhorado)
+                    const errorData = error.response?.data || error;
+                    
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (error.message) {
+                        errorMessage = error.message;
+                    }
+                    
+                    // Adicionar detalhes de validação se existirem (vem do backend)
+                    const validationErrors = errorData.errors || error.errors;
+                    if (validationErrors) {
+                        const errorDetails = Object.entries(validationErrors)
+                            .map(([field, messages]) => {
+                                const fieldName = field === 'password' ? 'Senha' : 
+                                                 field === 'email' ? 'E-mail' : 
+                                                 field === 'name' ? 'Nome' : field;
+                                const msgs = Array.isArray(messages) ? messages : [messages];
+                                return `${fieldName}: ${msgs.join(', ')}`;
+                            })
+                            .join('\n');
+                        
+                        if (errorDetails) {
+                            errorMessage += '\n\nDetalhes:\n' + errorDetails;
+                        }
+                    }
+                    
+                    // Se for erro de rede ou timeout, adicionar mensagem específica
+                    if (error.isNetworkError || error.isTimeout) {
+                        errorMessage += '\n\nVerifique sua conexão e tente novamente.';
+                    } else if (!validationErrors) {
+                        errorMessage += '\n\nTente novamente mais tarde.';
+                    }
+                    
+                    alert(errorMessage);
+                } finally {
+                    // Reabilitar botão
+                    registerButton.disabled = false;
+                    registerButton.textContent = 'Cadastrar';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

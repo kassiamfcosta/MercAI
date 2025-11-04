@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercAI - Meu Perfil</title>
+
+    <style>
+        /* Variáveis de Cores (Copiadas das telas anteriores) */
+        :root {
+            --cor-fundo-app: #f0f2f5;
+            --cor-fundo-topo: #0b1a2b;
+            --cor-texto-claro: #E0E0E0;
+            --cor-destaque-ciano: #00bcd4;
+            --cor-destaque-amarelo: #fbbc05;
+            --cor-nav-bar: var(--cor-fundo-topo);
+            --cor-icone-fundo-final: #152535;
+            --cor-erro: #e74c3c;
+            --cor-sair: #999;
+        }
+
+        /* Estilos Globais e Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            background-color: var(--cor-fundo-app);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .content-area {
+            padding-bottom: 85px;
+        }
+
+        /* --- 1. Top Section (Header Simplificado para Perfil) --- */
+        .top-section {
+            background-color: var(--cor-fundo-topo);
+            color: var(--cor-texto-claro);
+            padding: 25px 15px 40px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .profile-photo {
+            width: 100px;
+            height: 100px;
+            background-color: #555;
+            border-radius: 50%;
+            border: 3px solid var(--cor-destaque-amarelo);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            color: var(--cor-texto-claro);
+        }
+
+        .profile-photo img {
+            width: 70px;
+            height: 70px;
+            filter: invert(100%);
+        }
+
+        /* Informação Essencial (E-mail) */
+        .user-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-info h3 {
+            font-size: 1.2em;
+            color: var(--cor-destaque-ciano);
+        }
+
+        .user-info p {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        /* --- 2. Container de Ações (Fundo Claro) --- */
+        .action-container {
+            background-color: var(--cor-fundo-app);
+            padding: 20px 20px 40px 20px;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            margin-top: -15px;
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Estilo dos Botões de Ação */
+        .action-button {
+            width: 100%;
+            display: block;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* Ação Principal 1 (Listas) */
+        .btn-lists {
+            background-color: var(--cor-destaque-amarelo);
+            color: #333;
+        }
+
+        .btn-lists:hover {
+            background-color: #e6a700;
+        }
+
+        /* Ação Principal 2 (Premium) */
+        .btn-premium {
+            background-color: var(--cor-destaque-ciano);
+            color: var(--cor-fundo-topo);
+        }
+
+        .btn-premium:hover {
+            background-color: #00a9bf;
+        }
+
+        /* Ação Sair */
+        .btn-logout {
+            background-color: #ccc;
+            color: var(--cor-fundo-topo);
+            margin-top: 20px;
+        }
+
+        .btn-logout:hover {
+            background-color: #bbb;
+        }
+
+        /* Ação Crítica (Excluir Conta) */
+        .btn-delete {
+            background-color: transparent;
+            color: var(--cor-erro);
+            border: 2px solid var(--cor-erro);
+            margin-top: 15px;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        /* --- 4. Navbar Inferior (Copiada) --- */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: var(--cor-fundo-topo);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 10px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--cor-destaque-ciano);
+            font-size: 0.7em;
+            min-width: 20%;
+            width: 45px;
+            height: 45px;
+            justify-content: center;
+        }
+
+        .nav-item img {
+            width: 30px;
+            height: 30px;
+            filter: invert(56%) sepia(91%) saturate(2465%) hue-rotate(167deg) brightness(101%) contrast(101%);
+            margin-bottom: 0px;
+        }
+
+        .nav-item:not(.nav-center-item) .nav-text {
+            display: none;
+        }
+
+        .nav-item.active {
+            background-color: transparent;
+            border-radius: 0;
+            width: auto;
+            height: auto;
+            transform: none;
+        }
+
+        .nav-item.active img {
+            filter: invert(79%) sepia(74%) saturate(840%) hue-rotate(352deg) brightness(104%) contrast(97%);
+        }
+
+        .nav-center-item {
+            position: relative;
+            width: 80px;
+            height: 70px;
+        }
+
+        .nav-center-item::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background-color: transparent;
+            box-shadow: 0 0 0 1000px var(--cor-fundo-topo), inset 0 0 0 1000px var(--cor-fundo-app), 0 0 0 1000px var(--cor-fundo-app);
+            clip-path: circle(40px at 50% 50%);
+        }
+
+        .nav-center-button {
+            background-color: transparent;
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -110%);
+            box-shadow: none;
+            z-index: 10;
+            border: none;
+            overflow: visible;
+        }
+
+        .nav-center-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 0;
+            filter: none;
+            animation: rotate 10s linear infinite;
+            transform: none;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .nav-center-item .nav-text {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-area">
+        <header class="top-section">
+            <h2 class="header-title">Meu Perfil</h2>
+
+            <div class="profile-photo">
+                <img src="img/user.png" alt="Foto de Perfil">
+            </div>
+
+            <div class="user-info">
+                <h3 id="profile-name">[Nome do Usuário]</h3>
+                <p id="profile-email">[email@usuario.com]</p>
+            </div>
+        </header>
+
+        <main class="action-container">
+            <button class="action-button btn-lists" onclick="window.location.href='lista_de_compras.html'">
+                Ver Minhas Listas
+            </button>
+
+            <button class="action-button btn-premium" onclick="window.location.href='planos.html'">
+                Tornar-se Premium
+            </button>
+
+            <button class="action-button btn-logout" id="logout-btn">
+                Sair
+            </button>
+
+            <button class="action-button btn-delete" id="delete-account-btn">
+                Excluir Conta
+            </button>
+        </main>
+    </div>
+
+    <nav class="navbar">
+        <a href="inicio.html" class="nav-item"> <img src="img/home_barra_de_tarefa.png" alt="Início"> </a>
+        <a href="pesquisar_produto.html" class="nav-item"> <img src="img/lupa_barra_de_tarefa.png" alt="Busca"> </a>
+        <div class="nav-item nav-center-item"> <a href="#" class="nav-center-button"> <img
+                    src="img/botao_calculo_barra_tarefa.png" alt="MercAI"> </a> </div>
+        <a href="lista_de_compras.html" class="nav-item"> <img src="img/lista_barra_tarefa.png" alt="Listas"> </a>
+        <a href="perfil.html" class="nav-item active"> <img src="img/user.png" alt="Perfil"> </a>
+    </nav>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const profileNameElement = document.getElementById('profile-name');
+            const profileEmailElement = document.getElementById('profile-email');
+            const deleteBtn = document.getElementById('delete-account-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // --- 1. Carregar Dados do Usuário do localStorage ---
+            const userName = localStorage.getItem('mercai_userName');
+            const userEmail = localStorage.getItem('mercai_userEmail');
+
+            if (userName && userEmail) {
+                profileNameElement.textContent = `Olá, ${userName}`;
+                profileEmailElement.textContent = userEmail;
+            } else {
+                // Caso não haja dados salvos, exibe o padrão e força logout
+                profileNameElement.textContent = 'Usuário Desconhecido';
+                profileEmailElement.textContent = 'Faça login novamente';
+            }
+
+            // --- 2. Lógica do Botão Sair (Logout) ---
+            logoutBtn.addEventListener('click', () => {
+                // Limpa todos os dados de sessão simulados
+                localStorage.removeItem('mercai_userName');
+                localStorage.removeItem('mercai_userEmail');
+                localStorage.setItem('mercai_isLoggedIn', 'false'); // Define como deslogado
+
+                alert('Você foi desconectado com sucesso.');
+                window.location.href = 'login.html';
+            });
+
+            // --- 3. Lógica do Botão Excluir Conta (Pop-up) ---
+            deleteBtn.addEventListener('click', () => {
+                const isConfirmed = confirm('ATENÇÃO: Você tem certeza que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita.');
+
+                if (isConfirmed) {
+                    // Simulação de exclusão: Limpa todos os dados de usuário do localStorage
+                    localStorage.removeItem('mercai_userName');
+                    localStorage.removeItem('mercai_userEmail');
+                    localStorage.removeItem('mercai_isLoggedIn');
+                    localStorage.removeItem('mercai_users'); // Limpa o array de cadastros
+
+                    alert('Conta excluída com sucesso. Redirecionando para o login.');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // --- 4. Lógica de Navegação da Navbar (Mantida) ---
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (!link) return;
+
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href');
+                    if (href && href !== '#') {
+                        // Navega se não for o item central
+                        if (!item.classList.contains('nav-center-item')) {
+                            window.location.href = href;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
