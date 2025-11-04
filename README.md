@@ -5,12 +5,18 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-2.3+-green.svg)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen.svg)](https://kassiamfcosta.github.io/MercAI/)
 
 ## 📋 Sobre o Projeto
 
 O **MercAI** é uma aplicação completa de comparação de preços desenvolvida na disciplina de **Empreendedorismo** do curso de **Tecnologia em Sistemas para Internet (TSI)**.
 
 O sistema permite que usuários criem listas de compras, pesquisem produtos, comparem preços entre diferentes lojas e recebam sugestões otimizadas baseadas em preço, disponibilidade e proximidade.
+
+## 🌐 Acesso Online
+
+- **Frontend Web**: [https://kassiamfcosta.github.io/MercAI/](https://kassiamfcosta.github.io/MercAI/) (GitHub Pages)
+- **Repositório**: [https://github.com/kassiamfcosta/MercAI](https://github.com/kassiamfcosta/MercAI)
 
 ## 👥 Equipe de Desenvolvimento
 

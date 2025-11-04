@@ -6,9 +6,24 @@
 
 const API_CONFIG = {
     // URL base da API - ajustar conforme ambiente
-    BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:8000/api'
-        : `${window.location.protocol}//${window.location.host}/api`,
+    // Para GitHub Pages, usar URL do backend em produção
+    BASE_URL: (() => {
+        const hostname = window.location.hostname;
+        
+        // Desenvolvimento local
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return 'http://localhost:8000/api';
+        }
+        
+        // GitHub Pages - usar URL do backend em produção
+        // Altere esta URL para o seu backend em produção (ex: Render, Heroku, etc.)
+        if (hostname.includes('github.io') || hostname.includes('github-pages')) {
+            return 'https://seu-backend.herokuapp.com/api'; // Altere para sua URL de produção
+        }
+        
+        // Outros ambientes - usar mesmo host
+        return `${window.location.protocol}//${window.location.host}/api`;
+    })(),
     
     // Timeout para requisições (ms)
     TIMEOUT: 30000,
