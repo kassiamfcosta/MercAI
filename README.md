@@ -132,7 +132,7 @@ MercAI/
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/MayaraVieiraa/Mercai_.git
+   git clone https://github.com/kassiamfcosta/MercAI.git
    cd MercAI/mercai-backend
    ```
 
