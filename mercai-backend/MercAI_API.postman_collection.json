@@ -1,0 +1,507 @@
+{
+    "info": {
+      "name": "MercAI API",
+      "description": "Collection completa da API MercAI - Comparação de Preços",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "_exporter_id": "mercai-api"
+    },
+    "variable": [
+      {
+        "key": "base_url",
+        "value": "http://localhost:8000",
+        "type": "string"
+      },
+      {
+        "key": "token",
+        "value": "",
+        "type": "string"
+      }
+    ],
+    "item": [
+      {
+        "name": "Health Check",
+        "item": [
+          {
+            "name": "Health Check",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/health",
+                "host": ["{{base_url}}"],
+                "path": ["health"]
+              }
+            }
+          },
+          {
+            "name": "Root",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/",
+                "host": ["{{base_url}}"],
+                "path": [""]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Autenticação",
+        "item": [
+          {
+            "name": "Registrar Usuário",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 201) {",
+                    "    var jsonData = pm.response.json();",
+                    "    if (jsonData.data && jsonData.data.token) {",
+                    "        pm.collectionVariables.set('token', jsonData.data.token);",
+                    "    }",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"teste@example.com\",\n  \"password\": \"senha123\",\n  \"name\": \"Usuario Teste\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/auth/register",
+                "host": ["{{base_url}}"],
+                "path": ["api", "auth", "register"]
+              }
+            }
+          },
+          {
+            "name": "Login",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "    var jsonData = pm.response.json();",
+                    "    if (jsonData.data && jsonData.data.token) {",
+                    "        pm.collectionVariables.set('token', jsonData.data.token);",
+                    "    }",
+                    "}"
+                  ]
+                }
+              }
+            ],
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"email\": \"teste@example.com\",\n  \"password\": \"senha123\"\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/auth/login",
+                "host": ["{{base_url}}"],
+                "path": ["api", "auth", "login"]
+              }
+            }
+          },
+          {
+            "name": "Obter Dados do Usuário (/me)",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/auth/me",
+                "host": ["{{base_url}}"],
+                "path": ["api", "auth", "me"]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Produtos",
+        "item": [
+          {
+            "name": "Buscar Produtos",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/products/search?q=arroz&category=alimentos&page=1&per_page=20",
+                "host": ["{{base_url}}"],
+                "path": ["api", "products", "search"],
+                "query": [
+                  {
+                    "key": "q",
+                    "value": "arroz"
+                  },
+                  {
+                    "key": "category",
+                    "value": "alimentos",
+                    "disabled": true
+                  },
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "per_page",
+                    "value": "20"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Obter Produto por ID",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/products/1",
+                "host": ["{{base_url}}"],
+                "path": ["api", "products", "1"]
+              }
+            }
+          },
+          {
+            "name": "Obter Ofertas de um Produto",
+            "request": {
+              "method": "GET",
+              "header": [],
+              "url": {
+                "raw": "{{base_url}}/api/products/1/offers?sort=price_asc&in_stock_only=true",
+                "host": ["{{base_url}}"],
+                "path": ["api", "products", "1", "offers"],
+                "query": [
+                  {
+                    "key": "sort",
+                    "value": "price_asc",
+                    "description": "price_asc, price_desc, score"
+                  },
+                  {
+                    "key": "in_stock_only",
+                    "value": "true"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Listas de Compras",
+        "item": [
+          {
+            "name": "Criar Lista",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Compras do Mês\",\n  \"latitude\": -15.7942,\n  \"longitude\": -47.8822\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/lists",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists"]
+              }
+            }
+          },
+          {
+            "name": "Listar Todas as Listas",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/lists",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists"]
+              }
+            }
+          },
+          {
+            "name": "Obter Lista por ID",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Atualizar Lista",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"name\": \"Novo Nome\",\n  \"latitude\": -15.7942,\n  \"longitude\": -47.8822\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Deletar Lista",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Adicionar Item à Lista",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id/items",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id", "items"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Remover Item da Lista",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id/items/:item_id",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id", "items", ":item_id"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  },
+                  {
+                    "key": "item_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Atualizar Quantidade do Item",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"quantity\": 3\n}"
+              },
+              "url": {
+                "raw": "{{base_url}}/api/lists/:list_id/items/:item_id",
+                "host": ["{{base_url}}"],
+                "path": ["api", "lists", ":list_id", "items", ":item_id"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  },
+                  {
+                    "key": "item_id",
+                    "value": ""
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      {
+        "name": "Ranking",
+        "item": [
+          {
+            "name": "Ranking Básico",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/ranking?list_id=&latitude=-15.7942&longitude=-47.8822",
+                "host": ["{{base_url}}"],
+                "path": ["api", "ranking"],
+                "query": [
+                  {
+                    "key": "list_id",
+                    "value": "",
+                    "description": "UUID da lista (obrigatório)"
+                  },
+                  {
+                    "key": "latitude",
+                    "value": "-15.7942",
+                    "disabled": true
+                  },
+                  {
+                    "key": "longitude",
+                    "value": "-47.8822",
+                    "disabled": true
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "name": "Ranking Detalhado",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{base_url}}/api/ranking/:list_id/detailed?latitude=-15.7942&longitude=-47.8822",
+                "host": ["{{base_url}}"],
+                "path": ["api", "ranking", ":list_id", "detailed"],
+                "variable": [
+                  {
+                    "key": "list_id",
+                    "value": ""
+                  }
+                ],
+                "query": [
+                  {
+                    "key": "latitude",
+                    "value": "-15.7942",
+                    "disabled": true
+                  },
+                  {
+                    "key": "longitude",
+                    "value": "-47.8822",
+                    "disabled": true
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
